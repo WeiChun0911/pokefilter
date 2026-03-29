@@ -1,0 +1,33 @@
+name: Update PvP Rankings Data
+
+on:
+  schedule:
+    # Run daily at 22:00 UTC (06:00 UTC+8)
+    - cron: "0 22 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Fetch rankings and build name list
+        run: npm run update-data
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/ src/data/
+          git diff --cached --quiet || git commit -m "chore: update pvp rankings data"
+          git push
