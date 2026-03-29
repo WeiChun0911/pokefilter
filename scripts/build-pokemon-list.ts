@@ -96,4 +96,4 @@ const outPath = resolve(outDir, "pokemon-names.txt");
 const names = final.map(({ zhName }) => zhName);
 const output = names.join(",");
 writeFile(outPath, output, "utf-8");
-console.log(`Total: ${names.length}, saved to src/data/pokemon-names.txt`);
+console.log(`Total: ${names.length}, saved to public/data/pokemon-names.txt`);
