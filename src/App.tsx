@@ -7,7 +7,7 @@ function App() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch("/data/pokemon-names.txt")
+    fetch(import.meta.env.BASE_URL + "data/pokemon-names.txt")
       .then((res) => res.text())
       .then((data) => setText(data))
       .catch(() => setText("Failed to load data"))
