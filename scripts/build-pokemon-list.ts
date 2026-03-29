@@ -92,8 +92,11 @@ import { fileURLToPath } from "node:url";
 const __dir = dirname(fileURLToPath(import.meta.url));
 const outDir = resolve(__dir, "..", "public", "data");
 mkdirSync(outDir, { recursive: true });
-const outPath = resolve(outDir, "pokemon-names.txt");
+const outPath = resolve(outDir, "pokemon-names.json");
 const names = final.map(({ zhName }) => zhName);
-const output = names.join(",");
-writeFile(outPath, output, "utf-8");
-console.log(`Total: ${names.length}, saved to public/data/pokemon-names.txt`);
+const payload = {
+  updatedAt: new Date().toISOString(),
+  names: names.join(","),
+};
+writeFile(outPath, JSON.stringify(payload), "utf-8");
+console.log(`Total: ${names.length}, saved to public/data/pokemon-names.json`);
