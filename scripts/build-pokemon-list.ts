@@ -85,7 +85,7 @@ const final = afterEvo.filter(({ speciesId }) => {
 });
 
 // Output as JSON for frontend
-import { writeFileSync as writeFile, mkdirSync } from "node:fs";
+import { writeFileSync as writeFile, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -94,9 +94,27 @@ const outDir = resolve(__dir, "..", "public", "data");
 mkdirSync(outDir, { recursive: true });
 const outPath = resolve(outDir, "pokemon-names.json");
 const names = final.map(({ zhName }) => zhName);
+const newNames = names.join(",");
+
+// Read existing file to compare names; only update updatedAt when names actually changed
+let updatedAt = new Date().toISOString();
+if (existsSync(outPath)) {
+  try {
+    const existing = JSON.parse(readFileSync(outPath, "utf-8"));
+    if (existing.names === newNames) {
+      // Names unchanged, keep existing timestamp and skip writing
+      console.log(`Total: ${names.length}, no changes detected, skipping write.`);
+      process.exit(0);
+    }
+    // Names changed, use new timestamp
+  } catch {
+    // File exists but can't be parsed, overwrite with new data
+  }
+}
+
 const payload = {
-  updatedAt: new Date().toISOString(),
-  names: names.join(","),
+  updatedAt,
+  names: newNames,
 };
 writeFile(outPath, JSON.stringify(payload), "utf-8");
 console.log(`Total: ${names.length}, saved to public/data/pokemon-names.json`);
